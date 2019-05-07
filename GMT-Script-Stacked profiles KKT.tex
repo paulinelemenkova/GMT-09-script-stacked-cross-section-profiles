@@ -1,0 +1,39 @@
+#!/bin/bash
+# Area: Kuril-Kamchatka Trench, North-West Pacific Ocean
+# Purpose: Bathymetric modelling. Stacking cross-sectioning profiles along the Kuril-Kamchatka Trench 
+# GMT modules: makecpt, gmtconvert, grdimage, grdtrack, pstext, psxy
+# Unix progs: cat, rm
+#
+# Step-1. Generate a file
+ps=KKTrench.ps
+#
+# Step-2. Extract a subset of ETOPO1m for the Kuril-Kamchatka Trench area
+grdcut earth_relief_01m.grd -R140/170/40/60 -Gkkt_relief.nc
+gmt makecpt -Crainbow -T-10000/1000/500 -Z > topo.cpt
+gmt grdimage @kkt_relief.nc -I+a15+ne0.75 -Ctopo.cpt -JM6i -P -Baf -K -Xc --FORMAT_GEO_MAP=dddF > $ps
+#
+# Step-3. Select two points along the Kuril-Kamchatka Trench
+cat << EOF > trench.txt
+159.0 50.0
+148.0 43.0
+EOF
+#
+# Step-4. Plot trench segment and end points
+gmt psxy -Rkkt_relief.nc -J -O -K -W2p,red trench.txt >> $ps # my line
+gmt psxy -R -J -O -K -Sc0.15i -Gred trench.txt >> $ps # points
+#
+# Step-5. Generate cross-track profiles 400 km long, spaced 10 km, sampled every 2km
+# and stack these using the median, write stacked profile
+gmt grdtrack trench.txt -Gkkt_relief.nc -C400k/2k/10k+v -Sm+sstack.txt > table.txt 
+gmt psxy -R -J -O -K -W0.5p table.txt >> $ps
+#
+# Step-6. Show upper/lower values encountered as an envelope
+gmt convert stack.txt -o0,5 > env.txt
+gmt convert stack.txt -o0,6 -I -T >> env.txt
+gmt psxy -R-200/200/-10000/0 -Bxafg1000+l"Distance from trench (km)" -Byaf+l"Depth (m)" -BWSne \
+	-JX6i/2i -O -K -Glightgray env.txt -Y6.5i >> $ps
+gmt psxy -R -J -O -K -W3p stack.txt >> $ps
+echo "0 -2000 Median Stacked Profile" | gmt pstext -R -J -O -K -Gwhite -F+jTC+f14p -Dj0.1i >> $ps
+gmt psxy -R -J -O -T >> $ps
+# cleanup
+rm -f z.cpt trench.txt table.txt env.txt stack.txt
