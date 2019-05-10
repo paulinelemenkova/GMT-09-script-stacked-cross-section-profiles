@@ -42,8 +42,8 @@ gmt psbasemap -R -J \
 #
 # Step-7. Select two points along the Kuril-Kamchatka Trench
 cat << EOF > trench2.txt
-158.5 50.0
 153.5 45.5
+158.5 50.0
 EOF
 #
 # Step-8. Plot trench segment and end points
@@ -79,3 +79,5 @@ echo "-150 -5000 Greater Kuril Chain" | gmt pstext -R -J -Gwhite -F+jTC+f8p -O -
 # Step-13. Add GMT logo
 gmt logo -Dx6.2/-21.0+o0.1i/0.1i+w2c -O >> cross2KKT.ps
 #gmt psxy -R -J -O -T >> cross2KKT.ps
+# Step-14. Clean up (not necessary in this case)
+#rm -f z.cpt ridge.txt table.txt env.txt stack.txt
