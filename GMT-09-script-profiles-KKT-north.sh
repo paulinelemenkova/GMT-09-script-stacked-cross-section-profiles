@@ -3,7 +3,7 @@
 # Area: along the track of the Kuril-Kamchatka Trench
 # Profiles info: 400 km long, spaced 10 km, sampled every 2km
 # # GMT modules: grdcut, makecpt, grdimage, psscale, grdcontour, psbasemap, psxy, grdtrack, convert, pstext, logo, psconvert
-# Unix prog: cat
+# Unix progs: echo, rm, cat
 # Step-1. Generate a file
 ps=cross2KKT.ps
 # Step-2. GMT set up
